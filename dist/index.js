@@ -2309,6 +2309,12 @@ async function npmPublish(opts = {}) {
     let publishedVersion = await npm_1.npm.getLatestVersion(manifest.name, options);
     // Determine if/how the version has changed
     let diff = semver.diff(manifest.version, publishedVersion);
+    if (manifest.version.raw.includes("beta")) {
+        options.tag = "beta";
+    }
+    else {
+        options.tag = "latest";
+    }
     if (diff || !options.checkVersion) {
         // Publish the new version to NPM
         await npm_1.npm.publish(manifest, options);
@@ -2319,8 +2325,9 @@ async function npmPublish(opts = {}) {
         version: manifest.version.raw,
         oldVersion: publishedVersion.raw,
         tag: options.tag,
-        access: options.access || (manifest.name.startsWith("@") ? "restricted" : "public"),
-        dryRun: options.dryRun
+        access: options.access ||
+            (manifest.name.startsWith("@") ? "restricted" : "public"),
+        dryRun: options.dryRun,
     };
     options.debug("OUTPUT:", results);
     return results;
