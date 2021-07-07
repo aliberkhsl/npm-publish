@@ -14,10 +14,14 @@ export async function npmPublish(opts: Options = {}): Promise<Results> {
   // Get the old and new version numbers
   let manifest = await readManifest(options.package, options.debug);
   let publishedVersion = await npm.getLatestVersion(manifest.name, options);
-  console.log(`Current version : `, manifest.version);
+
   // Determine if/how the version has changed
   let diff = semver.diff(manifest.version, publishedVersion);
-
+  if (manifest.version.raw.includes("beta")) {
+    options.tag = "beta";
+  } else {
+    options.tag = "latest";
+  }
   if (diff || !options.checkVersion) {
     // Publish the new version to NPM
     await npm.publish(manifest, options);
