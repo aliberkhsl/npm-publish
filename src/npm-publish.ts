@@ -14,7 +14,7 @@ export async function npmPublish(opts: Options = {}): Promise<Results> {
   // Get the old and new version numbers
   let manifest = await readManifest(options.package, options.debug);
   let publishedVersion = await npm.getLatestVersion(manifest.name, options);
-
+  console.log(`Current version : `, manifest.version);
   // Determine if/how the version has changed
   let diff = semver.diff(manifest.version, publishedVersion);
 
@@ -29,8 +29,10 @@ export async function npmPublish(opts: Options = {}): Promise<Results> {
     version: manifest.version.raw,
     oldVersion: publishedVersion.raw,
     tag: options.tag,
-    access: options.access || (manifest.name.startsWith("@") ? "restricted" : "public"),
-    dryRun: options.dryRun
+    access:
+      options.access ||
+      (manifest.name.startsWith("@") ? "restricted" : "public"),
+    dryRun: options.dryRun,
   };
 
   options.debug("OUTPUT:", results);
